@@ -1,0 +1,156 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fafafa;
+  margin: 20px;
+}
+
+p{
+  font-size: 18px;
+}
+
+table {
+  font-size: 13px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 6px;
+  border: 1px solid #ccc;
+  max-width: 160px;
+  overflow-wrap: break-word;
+  text-align: center;
+}
+
+button {
+  font-size: 14px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#income_table, #expense_table {
+  table-layout: fixed;
+}
+
+.back-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #2a2aa6;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #5858a8;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-container {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap; /* щоб на вузьких екранах не ламалося */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+}
+
+.filter-container label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-container input[type="date"] {
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 150px;
+  transition: border-color 0.3s ease;
+}
+
+.filter-container input[type="date"]:focus {
+  border-color: #4CAF50;
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.filter-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filter-container label:last-child {
+  margin-left: 20px;
+}
+
+#balance_message {
+  margin-top: 30px;
+  font-weight: 600;
+  font-size: 1.2em;
+  padding: 15px 20px;
+  border-radius: 8px;
+  background-color: #f0f4f8;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  max-width: 700px;
+  line-height: 1.4;
+}
+
+/* Для повідомлення уваги (витрати перевищують доходи) зробимо окремий клас */
+.warning {
+  background-color: #fff3f3;
+  color: #d32f2f;
+  border: 1.5px solid #d32f2f;
+}
+
+.success {
+  background-color: #e6f4ea;
+  color: #2e7d32;
+  border: 1.5px solid #2e7d32;
+}
+
+.neutral {
+  background-color: #fff8e1;
+  color: #f9a825;
+  border: 1.5px solid #f9a825;
+}
+
+.top-expense-categories {
+  margin-top: 12px;
+  padding-left: 25px;
+  max-width: 700px;
+  font-size: 16px;
+  color: #555;
+}
+
+.top-expense-categories ul {
+  margin: 6px 0 0 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.top-expense-categories li {
+  margin-bottom: 4px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.balance-difference {
+  font-size: 16px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 10px;
+  max-width: 700px;
+}
+
+

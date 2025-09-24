@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Дошка користувача</title>
+  <link rel="stylesheet" href="/static/register.css" />
+  <script src="/static/show_password.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Реєстрація</h2>
+    <form method="post" action="/register">
+      <input name="full_name" placeholder="ПІБ" required
+             value="{{ full_name if full_name is defined else '' }}" type="text">
+
+      <input name="password" id="password" type="password" placeholder="Пароль" required maxlength="100"
+             value="{{ password if password is defined else '' }}">
+
+      <label for="show_password_checkbox">
+        <input type="checkbox" id="show_password_checkbox"
+               onclick="togglePassword('show_password_checkbox', 'password')">
+        Показати пароль
+      </label>
+
+      <button type="submit">Зареєструватися</button>
+    </form>
+
+    {% if error %}
+    <p class="error-message">{{ error }}</p>
+    {% endif %}
+
+    <a href="/">← До входу</a>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Дошка користувача</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2 style="text-align: center;">Аналітичні графіки</h2>
+  <a href="/" class="back-button">← До входу</a>
+  <div style="display: flex; gap: 40px; margin-top: 40px;">
+    <!-- Ліва колонка: доходи -->
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 40px;">
+      <div>
+        <h3>Середня оцінка доходів по категоріях</h3>
+        <canvas id="incomeRatingChart" width="600" height="300"></canvas>
+      </div>
+      <div>
+        <h3>Залежність середньої суми від середньої оцінки користувача (Доходи)</h3>
+        <canvas id="incomeLineChart" width="600" height="300"></canvas>
+      </div>
+    </div>
+
+    <!-- Права колонка: витрати -->
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 40px;">
+      <div>
+        <h3>Середня оцінка витрат по категоріях</h3>
+        <canvas id="expenseRatingChart" width="600" height="300"></canvas>
+      </div>
+      <div>
+        <h3>Залежність середньої суми від середньої оцінки користувача (Витрати)</h3>
+        <canvas id="expenseLineChart" width="600" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <h2 style="text-align: center;">Ваші записи</h2>
+
+  <div style="margin-bottom: 20px;">
+    <button onclick="location.href='/add/income'" style="padding: 10px 20px; margin-right: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">
+      ➕ Додати дохід
+    </button>
+
+    <button onclick="location.href='/add/expense'" style="padding: 10px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px;">
+      ➖ Додати витрату
+    </button>
+  </div>
+
+  <div class="filter-container">
+    <label>Період з:
+      <input type="date" id="date_from" min="{{ min_date }}">
+    </label>
+    <label>по:
+      <input type="date" id="date_to" />
+    </label>
+    <label>
+      <input type="checkbox" id="monthly_only" /> Тільки щомісячні
+    </label>
+  </div>
+
+    <div id="balance_message" class="message-box"></div>
+    <div id="balance_difference" class="balance-difference"></div>
+    <div id="top_expense_categories" class="top-expense-categories"></div>
+
+
+
+  <div style="display: flex; gap: 40px;">
+    <!-- Доходи -->
+    <div style="flex: 1;">
+      <h2>Доходи</h2>
+      <p>Загальна сума: <span id="income_total">0.00</span> ₴</p>
+      <table id="income_table" border="1" cellpadding="8" cellspacing="0" style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width: 35px; cursor: pointer;" onclick="sortTable(this, 'date')">Дата ⬍</th>
+            <th style="width: 70px;">Категорія</th>
+            <th style="width: 330px;">Назва</th>
+            <th style="width: 100px; cursor: pointer;" onclick="sortTable(this, 'amount')">Сума (₴) ⬍</th>
+            <th style="width: 45px; cursor: pointer;" onclick="sortTable(this, 'rating')">Оцінка ⬍</th>
+            <th style="width: 85px;">Щомісячний</th>
+            <th style="width: 25px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records if r.type.value == "income" %}
+            <tr
+              data-date="{{ r.date }}"
+              data-amount="{{ r.amount }}"
+              data-rating="{{ r.rating }}"
+              data-monthly="{{ '1' if r.is_monthly else '0' }}"
+            >
+              <td>{{ r.date }}</td>
+              <td>{{ r.category }}</td>
+              <td>{{ r.name if r.name else "-" }}</td>
+              <td>{{ "%.2f"|format(r.amount) }}</td>
+              <td >{{ r.rating }}★</td>
+              <td>{{ "Так" if r.is_monthly else "Ні" }}</td>
+              <td>
+                <form method="post" action="/delete/{{ r.id }}" onsubmit="return confirmDelete();">
+                  <button style="background-color: #e53935; color: white; border: none; padding: 5px 10px; border-radius: 4px;">🗑</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Витрати -->
+    <div style="flex: 1;">
+      <h2>Витрати</h2>
+      <p>Загальна сума: <span id="expense_total">0.00</span> ₴</p>
+      <table id="expense_table" border="1" cellpadding="8" cellspacing="0" style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width: 35px; cursor: pointer;" onclick="sortTable(this, 'date')">Дата ⬍</th>
+            <th style="width: 70px;">Категорія</th>
+            <th style="width: 330px;">Назва</th>
+            <th style="width: 100px; cursor: pointer;" onclick="sortTable(this, 'amount')">Сума (₴) ⬍</th>
+            <th style="width: 45px; cursor: pointer;" onclick="sortTable(this, 'rating')">Оцінка ⬍</th>
+            <th style="width: 85px;">Щомісячна</th>
+            <th style="width: 25px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records if r.type.value == "expense" %}
+            <tr
+              data-date="{{ r.date }}"
+              data-amount="{{ r.amount }}"
+              data-rating="{{ r.rating }}"
+              data-monthly="{{ '1' if r.is_monthly else '0' }}"
+            >
+              <td>{{ r.date }}</td>
+              <td>{{ r.category }}</td>
+              <td>{{ r.name if r.name else "-" }}</td>
+              <td>{{ "%.2f"|format(r.amount) }}</td>
+              <td>{{ r.rating }}★</td>
+              <td>{{ "Так" if r.is_monthly else "Ні" }}</td>
+              <td>
+                <form method="post" action="/delete/{{ r.id }}" onsubmit="return confirmDelete();">
+                  <button style="background-color: #e53935; color: white; border: none; padding: 5px 10px; border-radius: 4px;">🗑</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
+
+
+<script>
+    function sortTable(th, key) {
+      const table = th.closest("table");
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.style.display !== "none");
+
+      // Зняти всі стрілки з інших заголовків
+      const allThs = table.querySelectorAll("th");
+      allThs.forEach(header => {
+        if (header !== th) {
+          header.textContent = header.textContent.replace(/[⬆⬇]/g, '⬍');
+          header.removeAttribute('data-order');
+        }
+      });
+
+      // Визначити напрямок
+      const ascending = th.dataset.order !== "asc";
+      th.dataset.order = ascending ? "asc" : "desc";
+
+      // Оновити стрілку
+      const baseText = th.textContent.replace(/[⬆⬇⬍]/g, '').trim();
+      th.textContent = baseText + (ascending ? " ⬆" : " ⬇");
+
+      // Сортування
+      rows.sort((a, b) => {
+        let aVal = a.dataset[key];
+        let bVal = b.dataset[key];
+
+        if (key === 'date') {
+          aVal = parseDate(aVal);
+          bVal = parseDate(bVal);
+        } else {
+          aVal = parseFloat(aVal);
+          bVal = parseFloat(bVal);
+        }
+
+        if (aVal < bVal) return ascending ? -1 : 1;
+        if (aVal > bVal) return ascending ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+    }
+
+
+  function confirmDelete() {
+    return confirm("Ви впевнені, що хочете видалити цей запис?");
+  }
+
+  function parseDate(input) {
+    if (!input) return null;
+    const parts = input.split("-");
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function countMonthlyOccurrences(startDateStr, from, to) {
+    if (!startDateStr) return 0;
+
+    const start = parseDate(startDateStr);
+    const periodFrom = from || start;
+    const periodTo = to || new Date();
+
+    if (start > periodTo) return 0;
+
+    let count = 0;
+    let current = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+
+    while (current <= periodTo) {
+      if (current >= periodFrom && current <= periodTo) {
+        count++;
+      }
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    return count;
+  }
+
+  function filterAndCalculate() {
+    const dateFrom = parseDate(document.getElementById('date_from').value);
+    const dateTo = parseDate(document.getElementById('date_to').value);
+    const monthlyOnly = document.getElementById('monthly_only').checked;
+
+    let incomeTotal = 0;
+    const incomeRows = document.querySelectorAll("#income_table tbody tr");
+    incomeRows.forEach(row => {
+      const rowDate = parseDate(row.dataset.date);
+      const amount = parseFloat(row.dataset.amount);
+      const isMonthly = row.dataset.monthly === "1";
+      const startDateStr = row.dataset.date;
+
+      let visible = true;
+
+      if (dateFrom && rowDate < dateFrom && !isMonthly) visible = false;
+      if (dateTo && rowDate > dateTo && !isMonthly) visible = false;
+      if (monthlyOnly && !isMonthly) visible = false;
+
+      let count = 1;
+      if (isMonthly) {
+        count = countMonthlyOccurrences(startDateStr, dateFrom, dateTo);
+        visible = count > 0;
+      }
+
+      row.style.display = visible ? "" : "none";
+
+      if (visible) {
+        incomeTotal += amount * count;
+      }
+    });
+
+
+    document.getElementById('income_total').textContent = incomeTotal.toFixed(2);
+
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("date_from").setAttribute("max", today);
+    document.getElementById("date_to").setAttribute("max", today);
+
+    let expenseTotal = 0;
+    const expenseRows = document.querySelectorAll("#expense_table tbody tr");
+
+    // Для підрахунку витрат по категоріях (для виводу ТОП)
+    const expenseByCategory = {};
+
+    expenseRows.forEach(row => {
+      const rowDate = parseDate(row.dataset.date);
+      const amount = parseFloat(row.dataset.amount);
+      const isMonthly = row.dataset.monthly === "1";
+      const startDateStr = row.dataset.date;
+      const category = row.cells[1].textContent.trim();
+
+      let visible = true;
+
+      if (dateFrom && rowDate < dateFrom && !isMonthly) visible = false;
+      if (dateTo && rowDate > dateTo && !isMonthly) visible = false;
+      if (monthlyOnly && !isMonthly) visible = false;
+
+      let count = 1;
+      if (isMonthly) {
+        count = countMonthlyOccurrences(startDateStr, dateFrom, dateTo);
+        visible = count > 0;
+      }
+
+      row.style.display = visible ? "" : "none";
+
+      if (visible) {
+        const totalAmount = amount * count;
+        expenseTotal += amount * count;
+
+        if (!expenseByCategory[category]) {
+          expenseByCategory[category] = 0;
+        }
+        expenseByCategory[category] += totalAmount;
+      }
+    });
+    document.getElementById('expense_total').textContent = expenseTotal.toFixed(2);
+
+    // Обчислення балансу і вивід повідомлення
+    const balanceMessageDiv = document.getElementById('balance_message');
+    const balanceDifferenceDiv = document.getElementById('balance_difference');
+    const topExpenseCategoriesDiv = document.getElementById('top_expense_categories');
+
+    topExpenseCategoriesDiv.innerHTML = ''; // очистити попередній список
+    balanceMessageDiv.className = ""; // скинути класи
+    balanceDifferenceDiv.textContent = ''; // скинути різницю
+
+    const diff = incomeTotal - expenseTotal;
+    const absDiff = Math.abs(diff).toFixed(2);
+    const tolerance = incomeTotal * 0.05; // 5% толерантність
+
+    if (expenseTotal > incomeTotal) {
+      balanceMessageDiv.textContent = "Увага! Ваші витрати перевищують доходи. Рекомендуємо переглянути свої витрати за категоріями з найбільшими сумами:";
+      balanceMessageDiv.classList.add("warning");
+      balanceDifferenceDiv.textContent = `Різниця: -${absDiff} ₴ (перевитрата)`;
+
+      // ТОП-3 категорії витрат
+      const sortedCategories = Object.entries(expenseByCategory)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+      if (sortedCategories.length > 0) {
+        const list = document.createElement('ul');
+        sortedCategories.forEach(([cat, sum]) => {
+          const li = document.createElement('li');
+          li.textContent = `${cat}: ${sum.toFixed(2)} ₴`;
+          list.appendChild(li);
+        });
+        topExpenseCategoriesDiv.appendChild(list);
+      }
+
+    } else if (Math.abs(diff) <= tolerance) {
+      balanceMessageDiv.textContent = "Ваші доходи приблизно дорівнюють витратам. Рекомендуємо збільшити дохід для кращої фінансової стабільності.";
+      balanceMessageDiv.classList.add("neutral");
+      balanceDifferenceDiv.textContent = `Різниця: ${diff.toFixed(2)} ₴`;
+
+    } else {
+      balanceMessageDiv.textContent = "Ваші доходи перевищують витрати. Так тримати! Бажаємо удачі!";
+      balanceMessageDiv.classList.add("success");
+      balanceDifferenceDiv.textContent = `Різниця: +${diff.toFixed(2)} ₴`;
+    }
+
+
+  }
+
+
+  window.addEventListener('load', () => {
+    const dateToInput = document.getElementById('date_to');
+    const dateFromInput = document.getElementById('date_from');
+
+    const today = new Date().toISOString().split("T")[0];
+    if (dateToInput && !dateToInput.value) {
+      dateToInput.value = today;
+    }
+
+    const minDate = dateFromInput.min;
+
+    dateFromInput.addEventListener('change', () => {
+      if (minDate && dateFromInput.value < minDate) {
+        dateFromInput.value = minDate;
+      }
+      if (dateFromInput.value > dateToInput.value) {
+        dateFromInput.value = dateToInput.value;
+      }
+    });
+
+    dateToInput.addEventListener('change', () => {
+      if (dateFromInput.value > dateToInput.value) {
+        dateFromInput.value = dateToInput.value;
+      }
+    });
+
+    document.getElementById('monthly_only').addEventListener('change', filterAndCalculate);
+    document.getElementById('date_from').addEventListener('change', filterAndCalculate);
+    document.getElementById('date_to').addEventListener('change', filterAndCalculate);
+
+    filterAndCalculate();
+
+
+    // 🟢 Доходи — графік
+    const incomeCtx = document.getElementById('incomeRatingChart')?.getContext('2d');
+    if (incomeCtx) {
+      new Chart(incomeCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ income_avg_labels | tojson }},
+          datasets: [{
+            label: 'Середня оцінка доходів',
+            data: {{ income_avg_rating_values | tojson }},
+            backgroundColor: 'rgba(76, 175, 80, 0.6)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 0,
+              max: 5,
+              title: {
+                display: true,
+                text: 'Оцінка'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 🔴 Витрати — графік
+    const expenseCtx = document.getElementById('expenseRatingChart')?.getContext('2d');
+    if (expenseCtx) {
+      new Chart(expenseCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ expense_avg_labels | tojson }},
+          datasets: [{
+            label: 'Середня оцінка витрат',
+            data: {{ expense_avg_rating_values | tojson }},
+            backgroundColor: 'rgba(244, 67, 54, 0.6)',
+            borderColor: 'rgba(244, 67, 54, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 0,
+              max: 5,
+              title: {
+                display: true,
+                text: 'Оцінка'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Збираємо дані
+    let incomeDataPoints = {{ income_avg_amount_values | tojson }}.map((amount, i) => {
+      return { x: amount, y: {{ income_avg_rating_values | tojson }}[i] };
+    });
+
+    // Сортуємо по x (середня сума)
+    incomeDataPoints.sort((a, b) => a.x - b.x);
+
+    const ctxIncome = document.getElementById('incomeLineChart').getContext('2d');
+
+    new Chart(ctxIncome, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Залежність середньої оцінки від середньої суми (доходи)',
+          data: incomeDataPoints,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: { display: true, text: 'Середня сума (₴)' },
+            beginAtZero: true
+          },
+          y: {
+            title: { display: true, text: 'Середня оцінка' },
+            min: 0,
+            max: 5
+          }
+        }
+      }
+    });
+
+
+
+    let expenseDataPoints = {{ expense_avg_amount_values | tojson }}.map((amount, i) => {
+      return { x: amount, y: {{ expense_avg_rating_values | tojson }}[i] };
+    });
+
+    expenseDataPoints.sort((a, b) => a.x - b.x);
+
+    const ctxExpense = document.getElementById('expenseLineChart').getContext('2d');
+
+    new Chart(ctxExpense, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Залежність середньої оцінки від середньої суми (витрати)',
+          data: expenseDataPoints,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: { display: true, text: 'Середня сума (₴)' },
+            beginAtZero: true
+          },
+          y: {
+            title: { display: true, text: 'Середня оцінка' },
+            min: 0,
+            max: 5
+          }
+        }
+      }
+    });
+
+  });
+</script>
+

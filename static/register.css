@@ -1,0 +1,90 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 320px;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 25px;
+  color: #333;
+}
+
+form input[type="text"],
+form input[type="password"] {
+  width: 100%;
+  padding: 12px 10px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus {
+  border-color: #4CAF50;
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+form label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+}
+
+form button {
+  width: 100%;
+  padding: 12px 0;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #45a049;
+}
+
+a {
+  display: inline-block;
+  margin-top: 15px;
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #388e3c;
+}
+
+.error-message {
+  color: #d93025;
+  margin-bottom: 15px;
+  font-weight: 600;
+  font-size: 14px;
+}

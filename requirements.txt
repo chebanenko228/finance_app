@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+jinja2
+sqlalchemy
+pyodbc
+passlib
+python-multipart
+aiofiles
+itsdangerous

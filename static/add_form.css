@@ -1,0 +1,91 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fefefe;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* зверху, можна змінити на center, якщо хочеш по вертикалі */
+  padding: 40px 0;
+}
+
+.container {
+  background: #fff;
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  width: 360px;
+  box-sizing: border-box;
+}
+
+h2 {
+  margin-bottom: 30px;
+  color: #333;
+  text-align: center;
+}
+
+form label {
+  display: block;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+form select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="number"]:focus,
+form input[type="date"]:focus,
+form select:focus {
+  border-color: #3a86ff;
+  outline: none;
+  box-shadow: 0 0 6px rgba(58, 134, 255, 0.5);
+}
+
+form label > input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.15);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+form label:last-of-type {
+  margin-bottom: 25px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+form button {
+  width: 100%;
+  padding: 14px 0;
+  background-color: #3a86ff;
+  color: white;
+  font-weight: 700;
+  font-size: 17px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #265ecc;
+}
